@@ -8,8 +8,7 @@ struct ExternalPlayerHelper {
             let end = formatTimestamp(sub.end)
             return "\(i+1)
 \(start) --> \(end)
-\(sub.text)
-"
+\(sub.text)"
         }.joined(separator: "
 
 ")
