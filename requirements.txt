@@ -1,5 +1,7 @@
-flask
 git+https://github.com/openai/whisper.git
-
+flask
+whisper
+torch
+ffmpeg-python
 deep-translator
-gunicorn
+python-dotenv
