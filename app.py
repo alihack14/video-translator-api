@@ -4,11 +4,29 @@ import os
 import whisper
 from deep_translator import GoogleTranslator
 
+from flask import Flask, request, jsonify
+import whisper
+
 app = Flask(__name__)
-UPLOAD_FOLDER = 'uploads'
-TRANSLATED_FOLDER = 'translated'
-os.makedirs(UPLOAD_FOLDER, exist_ok=True)
-os.makedirs(TRANSLATED_FOLDER, exist_ok=True)
+model = whisper.load_model("base")
+
+@app.route("/upload_with_translation", methods=["POST"])
+def upload_with_translation():
+    video = request.files["video"]
+    target_lang = request.form["target_lang"]
+
+    video_path = "temp_video.mp4"
+    video.save(video_path)
+
+    result = model.transcribe(video_path, language=target_lang)
+    segments = result["segments"]  # يحتوي على text, start, end
+
+    subtitles = [
+        {"text": seg["text"], "start": seg["start"], "end": seg["end"]}
+        for seg in segments
+    ]
+
+    return jsonify(subtitles)
 
 model = whisper.load_model("base")
 
