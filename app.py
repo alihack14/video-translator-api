@@ -1,8 +1,75 @@
-from flask import Flask, request, send_from_directory
+from flask import Flask, request
+from werkzeug.utils import secure_filename
 import os
-from flask import Flask
+from flask import Flask, request, jsonify, Response
+import whisper
+import tempfile
 
 app = Flask(__name__)
+model = whisper.load_model("tiny")
+
+@app.route('/')
+def home():
+    return "الخدمة تعمل بنجاح من Flask 🎉"
+
+@app.route('/upload_with_translation', methods=['POST'])
+def upload_with_translation():
+    video = request.files.get('video')
+    target_lang = request.form.get('target_lang', 'ar')
+    format_type = request.form.get('format', 'json')  # 'json' أو 'srt'
+
+    if not video:
+        return "لم يتم إرسال فيديو", 400
+
+    with tempfile.NamedTemporaryFile(delete=False, suffix=".mp4") as temp_video:
+        video.save(temp_video.name)
+
+        result = model.transcribe(temp_video.name, language=target_lang)
+        segments = result["segments"]
+
+        if format_type == "srt":
+            srt_output = ""
+            for i, seg in enumerate(segments, start=1):
+                start = format_timestamp(seg["start"])
+                end = format_timestamp(seg["end"])
+                text = seg["text"].strip()
+                srt_output += f"{i}\n{start} --> {end}\n{text}\n\n"
+            return Response(srt_output, mimetype="text/plain")
+
+        else:  # JSON
+            subtitles = [
+                {"text": seg["text"], "start": seg["start"], "end": seg["end"]}
+                for seg in segments
+            ]
+            return jsonify(subtitles)
+
+def format_timestamp(seconds):
+    hrs = int(seconds // 3600)
+    mins = int((seconds % 3600) // 60)
+    secs = int(seconds % 60)
+    millis = int((seconds - int(seconds)) * 1000)
+    return f"{hrs:02}:{mins:02}:{secs:02},{millis:03}"
+
+
+@app.route('/')
+def home():
+    return "الخدمة تعمل بنجاح من Flask 🎉"
+
+@app.route('/upload_with_translation', methods=['POST'])
+def upload_with_translation():
+    video = request.files.get('video')
+    target_lang = request.form.get('target_lang', 'ar')
+
+    if not video:
+        return "لم يتم إرسال فيديو", 400
+
+    filename = secure_filename(video.filename)
+    save_path = os.path.join("uploads", filename)
+    os.makedirs("uploads", exist_ok=True)
+    video.save(save_path)
+
+    # هنا تقدر تضيف كود Whisper أو أي ترجمة
+    return f"تم استلام الفيديو: {filename} بلغة: {target_lang}"
 
 @app.route('/')
 def home():

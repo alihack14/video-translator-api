@@ -1,4 +1,4 @@
-static func fetchSyncedSubtitles(videoURL: URL, targetLang: String, completion: @escaping ([Subtitle]) -> Void) {
+static let serverURL = "https://video-translator-api-5.onrender.com"
     // نفس إعدادات request السابقة
     // بعد استلام البيانات:
     let decoder = JSONDecoder()
@@ -8,3 +8,6 @@ static func fetchSyncedSubtitles(videoURL: URL, targetLang: String, completion: 
         }
     }
 }
+body.append("--\(boundary)\r\n".data(using: .utf8)!)
+body.append("Content-Disposition: form-data; name=\"format\"\r\n\r\n".data(using: .utf8)!)
+body.append("json\r\n".data(using: .utf8)!)
