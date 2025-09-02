@@ -1,5 +1,16 @@
 from flask import Flask, request, send_from_directory
 import os
+from flask import Flask
+
+app = Flask(__name__)
+
+@app.route('/')
+def home():
+    return "Hello from Flask"
+
+if __name__ == "__main__":
+    port = int(os.environ.get("PORT", 10000))  # هذا هو السطر المهم
+    app.run(host="0.0.0.0", port=port)
 #from moviepy.editor import VideoFileClip
 import whisper
 from deep_translator import GoogleTranslator
