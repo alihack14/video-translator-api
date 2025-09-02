@@ -1,4 +1,4 @@
-gunicornflask
+gunicorn
 whisper
 torch
 ffmpeg-python
