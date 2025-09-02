@@ -1,6 +1,6 @@
 from flask import Flask, request, send_from_directory
 import os
-from moviepy.editor import VideoFileClip
+#from moviepy.editor import VideoFileClip
 import whisper
 from deep_translator import GoogleTranslator
 
