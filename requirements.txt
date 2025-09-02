@@ -1,4 +1,5 @@
 flask
-whisper
+git+https://github.com/openai/whisper.git
+
 deep-translator
 gunicorn
